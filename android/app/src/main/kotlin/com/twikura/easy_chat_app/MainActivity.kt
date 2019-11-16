@@ -1,4 +1,4 @@
-package com.example.easy_chat_app
+package com.twikura.easy_chat_app
 
 import android.os.Bundle
 
