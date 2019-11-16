@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "925639062002",
+    "firebase_url": "https://easy-chat-app-6d146.firebaseio.com",
+    "project_id": "easy-chat-app-6d146",
+    "storage_bucket": "easy-chat-app-6d146.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:925639062002:android:70809f2a31b8593fa67b6b",
+        "android_client_info": {
+          "package_name": "com.twikura.easy_chat_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "925639062002-k813gi0tejlt5uf0h28du9dsk199fn0b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.twikura.easy_chat_app",
+            "certificate_hash": "1073bb331230145515b960cb5d0ac5436f9c19f1"
+          }
+        },
+        {
+          "client_id": "925639062002-skmnkp03ocjh2nt5355g2q0ke7ee8umk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsRB-J4ETKAuNLokafqq2IVZtGVVPBLSU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "925639062002-skmnkp03ocjh2nt5355g2q0ke7ee8umk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
