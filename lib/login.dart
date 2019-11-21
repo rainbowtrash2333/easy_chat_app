@@ -82,43 +82,50 @@ class LoginScreenState extends State<LoginScreen> {
       idToken: googleAuth.idToken,
     );
 
-    FirebaseUser firebaseUser = (await firebaseAuth.signInWithCredential(credential)).user;
+    try {
+      FirebaseUser firebaseUser = (await firebaseAuth.signInWithCredential(credential)).user;
+      assert(firebaseUser.email != null);
+      assert(await firebaseUser.getIdToken(refresh: true) != null);
+      if (firebaseUser != null) {
+        // Check is already sign up
+        final QuerySnapshot result =
+            await Firestore.instance.collection('users').where('id', isEqualTo: firebaseUser.uid).getDocuments();
+        final List<DocumentSnapshot> documents = result.documents;
+        if (documents.length == 0) {
+          // Update data to server if new user
+          Firestore.instance.collection('users').document(firebaseUser.uid).setData({
+            'nickname': firebaseUser.displayName,
+            'photoUrl': firebaseUser.photoUrl,
+            'id': firebaseUser.uid,
+            'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
+            'chattingWith': null
+          });
 
-    if (firebaseUser != null) {
-      // Check is already sign up
-      final QuerySnapshot result =
-          await Firestore.instance.collection('users').where('id', isEqualTo: firebaseUser.uid).getDocuments();
-      final List<DocumentSnapshot> documents = result.documents;
-      if (documents.length == 0) {
-        // Update data to server if new user
-        Firestore.instance.collection('users').document(firebaseUser.uid).setData({
-          'nickname': firebaseUser.displayName,
-          'photoUrl': firebaseUser.photoUrl,
-          'id': firebaseUser.uid,
-          'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
-          'chattingWith': null
+          // Write data to local
+          currentUser = firebaseUser;
+          await prefs.setString('id', currentUser.uid);
+          await prefs.setString('nickname', currentUser.displayName);
+          await prefs.setString('photoUrl', currentUser.photoUrl);
+        } else {
+          // Write data to local
+          await prefs.setString('id', documents[0]['id']);
+          await prefs.setString('nickname', documents[0]['nickname']);
+          await prefs.setString('photoUrl', documents[0]['photoUrl']);
+          await prefs.setString('aboutMe', documents[0]['aboutMe']);
+        }
+        Fluttertoast.showToast(msg: "Sign in success");
+        this.setState(() {
+          isLoading = false;
         });
 
-        // Write data to local
-        currentUser = firebaseUser;
-        await prefs.setString('id', currentUser.uid);
-        await prefs.setString('nickname', currentUser.displayName);
-        await prefs.setString('photoUrl', currentUser.photoUrl);
+        Navigator.push(context, MaterialPageRoute(builder: (context) => MainScreen(currentUserId: firebaseUser.uid)));
       } else {
-        // Write data to local
-        await prefs.setString('id', documents[0]['id']);
-        await prefs.setString('nickname', documents[0]['nickname']);
-        await prefs.setString('photoUrl', documents[0]['photoUrl']);
-        await prefs.setString('aboutMe', documents[0]['aboutMe']);
+        Fluttertoast.showToast(msg: "Sign in fail");
       }
-      Fluttertoast.showToast(msg: "Sign in success");
-      this.setState(() {
-        isLoading = false;
-      });
-
-      Navigator.push(context, MaterialPageRoute(builder: (context) => MainScreen(currentUserId: firebaseUser.uid)));
-    } else {
-      Fluttertoast.showToast(msg: "Sign in fail");
+    } catch (e) {
+      debugPrint(e.message.toString());
+      Fluttertoast.showToast(msg: "Network Error, Please Retry.");
+    } finally {
       this.setState(() {
         isLoading = false;
       });
