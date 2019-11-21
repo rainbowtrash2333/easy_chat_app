@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "925639062002-glv2lg3f59mc6uvkg2b959ajqcevj9jq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.twikura.easy_chat_app",
+            "certificate_hash": "4d2094f37606760109530dced038b93c9a5ba6a3"
+          }
+        },
+        {
           "client_id": "925639062002-pbvq6htnvgihbvulil5mbfkpc65u1nms.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
