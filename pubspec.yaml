@@ -1,5 +1,9 @@
 name: easy_chat_app
-description: A new Flutter project.
+description: Simply new chat App based on Firebase.
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -23,6 +27,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+
 flutter:
   uses-material-design: true
 
@@ -37,3 +42,4 @@ flutter:
     - images/mimi7.gif
     - images/mimi8.gif
     - images/mimi9.gif
+
