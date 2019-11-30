@@ -13,11 +13,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Chat Demo',
+      title: '登录',
       theme: ThemeData(
         primaryColor: themeColor,
       ),
-      home: LoginScreen(title: 'CHAT DEMO'),
+      home: LoginScreen(title: '登录'),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -35,6 +35,7 @@ class LoginScreen extends StatefulWidget {
 class LoginScreenState extends State<LoginScreen> {
   final GoogleSignIn googleSignIn = GoogleSignIn();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  // 用于本地存储个人信息
   SharedPreferences prefs;
 
   bool isLoading = false;
@@ -74,6 +75,7 @@ class LoginScreenState extends State<LoginScreen> {
       isLoading = true;
     });
 
+    // 谷歌登录
     GoogleSignInAccount googleUser = await googleSignIn.signIn();
     GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
@@ -83,6 +85,7 @@ class LoginScreenState extends State<LoginScreen> {
     );
 
     try {
+      // 新用户，则写入数据库
       FirebaseUser firebaseUser = (await firebaseAuth.signInWithCredential(credential)).user;
       assert(firebaseUser.email != null);
       assert(await firebaseUser.getIdToken(refresh: true) != null);
@@ -148,7 +151,7 @@ class LoginScreenState extends State<LoginScreen> {
               child: FlatButton(
                   onPressed: handleSignIn,
                   child: Text(
-                    'SIGN IN WITH GOOGLE',
+                    '谷歌登录',
                     style: TextStyle(fontSize: 16.0),
                   ),
                   color: Color(0xffdd4b39),

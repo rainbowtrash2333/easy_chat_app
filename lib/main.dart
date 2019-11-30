@@ -30,14 +30,21 @@ class MainScreenState extends State<MainScreen> {
   MainScreenState({Key key, @required this.currentUserId});
 
   final String currentUserId;
+
+  // the Firebase Cloud Messaging API
+  // 详情 https://firebase.google.com/docs/cloud-messaging/
   final FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      new FlutterLocalNotificationsPlugin();
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   bool isLoading = false;
+
+  // 右上角的三个点
+  // 点击选择操作
   List<Choice> choices = const <Choice>[
-    const Choice(title: 'Settings', icon: Icons.settings),
-    const Choice(title: 'Log out', icon: Icons.exit_to_app),
+    const Choice(title: '设置', icon: Icons.settings),
+    const Choice(title: '注销', icon: Icons.exit_to_app),
   ];
 
   @override
@@ -64,30 +71,39 @@ class MainScreenState extends State<MainScreen> {
 
     firebaseMessaging.getToken().then((token) {
       print('token: $token');
-      Firestore.instance.collection('users').document(currentUserId).updateData({'pushToken': token});
+      Firestore.instance
+          .collection('users')
+          .document(currentUserId)
+          .updateData({'pushToken': token});
     }).catchError((err) {
       Fluttertoast.showToast(msg: err.message.toString());
     });
   }
 
   void configLocalNotification() {
-    var initializationSettingsAndroid = new AndroidInitializationSettings('app_icon');
+    var initializationSettingsAndroid =
+        new AndroidInitializationSettings('app_icon');
     var initializationSettingsIOS = new IOSInitializationSettings();
-    var initializationSettings = new InitializationSettings(initializationSettingsAndroid, initializationSettingsIOS);
+    var initializationSettings = new InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
 
+  // 绑定右上角三点按钮的动作
   void onItemMenuPress(Choice choice) {
-    if (choice.title == 'Log out') {
+    if (choice.title == '注销') {
       handleSignOut();
-    } else {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Settings()));
+    } else if (choice.title == '设置') {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => Settings()));
     }
   }
 
   void showNotification(message) async {
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-      Platform.isAndroid ? 'com.dfa.flutterchatdemo': 'com.duytq.flutterchatdemo',
+      Platform.isAndroid
+          ? 'com.dfa.flutterchatdemo'
+          : 'com.duytq.flutterchatdemo',
       'Flutter chat demo',
       'your channel description',
       playSound: true,
@@ -96,10 +112,10 @@ class MainScreenState extends State<MainScreen> {
       priority: Priority.High,
     );
     var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
-    var platformChannelSpecifics =
-        new NotificationDetails(androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-        0, message['title'].toString(), message['body'].toString(), platformChannelSpecifics,
+    var platformChannelSpecifics = new NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(0, message['title'].toString(),
+        message['body'].toString(), platformChannelSpecifics,
         payload: json.encode(message));
   }
 
@@ -113,7 +129,8 @@ class MainScreenState extends State<MainScreen> {
         context: context,
         builder: (BuildContext context) {
           return SimpleDialog(
-            contentPadding: EdgeInsets.only(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0),
+            contentPadding:
+                EdgeInsets.only(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0),
             children: <Widget>[
               Container(
                 color: themeColor,
@@ -131,11 +148,14 @@ class MainScreenState extends State<MainScreen> {
                       margin: EdgeInsets.only(bottom: 10.0),
                     ),
                     Text(
-                      'Exit app',
-                      style: TextStyle(color: Colors.white, fontSize: 18.0, fontWeight: FontWeight.bold),
+                      '退出',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      'Are you sure to exit app?',
+                      '确定退出app？',
                       style: TextStyle(color: Colors.white70, fontSize: 14.0),
                     ),
                   ],
@@ -155,8 +175,9 @@ class MainScreenState extends State<MainScreen> {
                       margin: EdgeInsets.only(right: 10.0),
                     ),
                     Text(
-                      'CANCEL',
-                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+                      '取消',
+                      style: TextStyle(
+                          color: primaryColor, fontWeight: FontWeight.bold),
                     )
                   ],
                 ),
@@ -175,8 +196,9 @@ class MainScreenState extends State<MainScreen> {
                       margin: EdgeInsets.only(right: 10.0),
                     ),
                     Text(
-                      'YES',
-                      style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+                      '确定',
+                      style: TextStyle(
+                          color: primaryColor, fontWeight: FontWeight.bold),
                     )
                   ],
                 ),
@@ -205,8 +227,9 @@ class MainScreenState extends State<MainScreen> {
       isLoading = false;
     });
 
-    Navigator.of(context)
-        .pushAndRemoveUntil(MaterialPageRoute(builder: (context) => MyApp()), (Route<dynamic> route) => false);
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => MyApp()),
+        (Route<dynamic> route) => false);
   }
 
   @override
@@ -214,7 +237,7 @@ class MainScreenState extends State<MainScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'MAIN',
+          'Easy Chat',
           style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -249,6 +272,7 @@ class MainScreenState extends State<MainScreen> {
         child: Stack(
           children: <Widget>[
             // List
+            // 创建用户列表
             Container(
               child: StreamBuilder(
                 stream: Firestore.instance.collection('users').snapshots(),
@@ -262,7 +286,8 @@ class MainScreenState extends State<MainScreen> {
                   } else {
                     return ListView.builder(
                       padding: EdgeInsets.all(10.0),
-                      itemBuilder: (context, index) => buildItem(context, snapshot.data.documents[index]),
+                      itemBuilder: (context, index) =>
+                          buildItem(context, snapshot.data.documents[index]),
                       itemCount: snapshot.data.documents.length,
                     );
                   }
@@ -275,7 +300,9 @@ class MainScreenState extends State<MainScreen> {
               child: isLoading
                   ? Container(
                       child: Center(
-                        child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+                        child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(themeColor)),
                       ),
                       color: Colors.white.withOpacity(0.8),
                     )
@@ -302,7 +329,8 @@ class MainScreenState extends State<MainScreen> {
                         placeholder: (context, url) => Container(
                           child: CircularProgressIndicator(
                             strokeWidth: 1.0,
-                            valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(themeColor),
                           ),
                           width: 50.0,
                           height: 50.0,
@@ -359,7 +387,8 @@ class MainScreenState extends State<MainScreen> {
           },
           color: greyColor2,
           padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         ),
         margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
       );
