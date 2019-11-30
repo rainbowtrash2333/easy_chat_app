@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+
 // todo：修改为传入经纬度，显示marker
 class Map extends StatefulWidget {
+  double latitude;
+  double longitude;
+
+  Map({this.latitude, this.longitude});
+
   @override
   _MapState createState() => _MapState();
 }
 
 class _MapState extends State<Map> {
-  GoogleMapController _controller ;
+  GoogleMapController _controller;
 
   static const LatLng _center = const LatLng(39.913818, 116.363625);
 
@@ -21,8 +27,7 @@ class _MapState extends State<Map> {
   Position _currentPosition;
 
   _getCurrentLocation() {
-    final Geolocator geolocator = Geolocator()
-      ..forceAndroidLocationManager;
+    final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 
     geolocator
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
@@ -36,20 +41,21 @@ class _MapState extends State<Map> {
     });
   }
 
-  LatLng _userPostion=LatLng(24.8275832, 102.8522499);
+  LatLng _userPostion = LatLng(24.8275832, 102.8522499);
 
   void _onAddMarkerButtonPressed() {
     _getCurrentLocation();
     _controller.animateCamera(
       CameraUpdate.newCameraPosition(
-        CameraPosition(
-            target: _userPostion, zoom: 10.0),
+        CameraPosition(target: _userPostion, zoom: 15.0),
       ),
     );
 
     if (_currentPosition != null) {
-      _userPostion = LatLng(_currentPosition.latitude, _currentPosition.longitude);
-      print("LAT: ${_currentPosition.latitude}, LNG: ${_currentPosition.longitude}");
+      _userPostion =
+          LatLng(_currentPosition.latitude, _currentPosition.longitude);
+      print(
+          "LAT: ${_currentPosition.latitude}, LNG: ${_currentPosition.longitude}");
     }
 
     setState(() {
@@ -99,7 +105,7 @@ class _MapState extends State<Map> {
               padding: const EdgeInsets.all(16.0),
               child: Align(
                 alignment: Alignment.bottomRight,
-                child:FloatingActionButton(
+                child: FloatingActionButton(
                   onPressed: _onAddMarkerButtonPressed,
                   materialTapTargetSize: MaterialTapTargetSize.padded,
                   backgroundColor: Colors.blue,
