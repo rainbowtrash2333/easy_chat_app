@@ -16,7 +16,7 @@ class Settings extends StatelessWidget {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(
-          'SETTINGS',
+          '设置',
           style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -98,7 +98,7 @@ class SettingsScreenState extends State<SettingsScreen> {
             setState(() {
               isLoading = false;
             });
-            Fluttertoast.showToast(msg: "Upload success");
+            Fluttertoast.showToast(msg: "更新成功");
           }).catchError((err) {
             setState(() {
               isLoading = false;
@@ -109,13 +109,13 @@ class SettingsScreenState extends State<SettingsScreen> {
           setState(() {
             isLoading = false;
           });
-          Fluttertoast.showToast(msg: 'This file is not an image');
+          Fluttertoast.showToast(msg: '这不是图片文件');
         });
       } else {
         setState(() {
           isLoading = false;
         });
-        Fluttertoast.showToast(msg: 'This file is not an image');
+        Fluttertoast.showToast(msg: '这不是图片文件');
       }
     }, onError: (err) {
       setState(() {
@@ -145,7 +145,7 @@ class SettingsScreenState extends State<SettingsScreen> {
         isLoading = false;
       });
 
-      Fluttertoast.showToast(msg: "Update success");
+      Fluttertoast.showToast(msg: "更新成功");
     }).catchError((err) {
       setState(() {
         isLoading = false;
@@ -227,7 +227,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                   // Username
                   Container(
                     child: Text(
-                      'Nickname',
+                      '昵称',
                       style: TextStyle(fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: primaryColor),
                     ),
                     margin: EdgeInsets.only(left: 10.0, bottom: 5.0, top: 10.0),
@@ -254,7 +254,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                   // About me
                   Container(
                     child: Text(
-                      'About me',
+                      '关于我',
                       style: TextStyle(fontStyle: FontStyle.italic, fontWeight: FontWeight.bold, color: primaryColor),
                     ),
                     margin: EdgeInsets.only(left: 10.0, top: 30.0, bottom: 5.0),
@@ -264,7 +264,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                       data: Theme.of(context).copyWith(primaryColor: primaryColor),
                       child: TextField(
                         decoration: InputDecoration(
-                          hintText: 'Fun, like travel and play PES...',
+                          hintText: '懒死了，还没有写...',
                           contentPadding: EdgeInsets.all(5.0),
                           hintStyle: TextStyle(color: greyColor),
                         ),
@@ -286,7 +286,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 child: FlatButton(
                   onPressed: handleUpdateData,
                   child: Text(
-                    'UPDATE',
+                    '更新',
                     style: TextStyle(fontSize: 16.0),
                   ),
                   color: primaryColor,
