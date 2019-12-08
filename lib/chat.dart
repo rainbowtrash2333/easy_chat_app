@@ -18,7 +18,11 @@ class Chat extends StatelessWidget {
   final String peerAvatar;
   final String peerNickName;
 
-  Chat({Key key, @required this.peerId, @required this.peerAvatar,@required this.peerNickName})
+  Chat(
+      {Key key,
+      @required this.peerId,
+      @required this.peerAvatar,
+      @required this.peerNickName})
       : super(key: key);
 
   @override
@@ -153,8 +157,7 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   // 发送消息
-  // type: 0 = text, 1 = image, 2 = sticker
-  //todo: type=4 定位
+  // type: 0 = text, 1 = image, 2 = sticker  type=3 position
   void onSendMessage(String content, int type) {
     if (content.trim() != '') {
       textEditingController.clear();
@@ -187,97 +190,282 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   Widget buildItem(int index, DocumentSnapshot document) {
+    // 跳转map页
+    void _gotoMapPage() {
+      Navigator.push(
+        context,
+        // 需要修改
+        new MaterialPageRoute(builder: (context) => Map()),
+      );
+    }
+
+    // 显示自己的消息
+    Container showRightMassage(int type, String msg) {
+      // type 0
+      Container textContainer = new Container(
+        child: Text(
+          msg,
+          style: TextStyle(color: primaryColor),
+        ),
+        padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+        width: 200.0,
+        decoration: BoxDecoration(
+            color: greyColor2, borderRadius: BorderRadius.circular(8.0)),
+        margin: EdgeInsets.only(
+            bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
+      );
+
+      // type 1
+      Container imageContainer = new Container(
+        child: FlatButton(
+          child: Material(
+            child: CachedNetworkImage(
+              placeholder: (context, url) => Container(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                ),
+                width: 200.0,
+                height: 200.0,
+                padding: EdgeInsets.all(70.0),
+                decoration: BoxDecoration(
+                  color: greyColor2,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(8.0),
+                  ),
+                ),
+              ),
+              errorWidget: (context, url, error) => Material(
+                child: Image.asset(
+                  'images/img_not_available.jpeg',
+                  width: 200.0,
+                  height: 200.0,
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(8.0),
+                ),
+                clipBehavior: Clip.hardEdge,
+              ),
+              imageUrl: document['content'],
+              width: 200.0,
+              height: 200.0,
+              fit: BoxFit.cover,
+            ),
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            clipBehavior: Clip.hardEdge,
+          ),
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => FullPhoto(url: document['content'])));
+          },
+          padding: EdgeInsets.all(0),
+        ),
+        margin: EdgeInsets.only(
+            bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
+      );
+//      type 2
+      Container stickerContainer = new Container(
+        child: new Image.asset(
+          'images/${document['content']}.gif',
+          width: 100.0,
+          height: 100.0,
+          fit: BoxFit.cover,
+        ),
+        margin: EdgeInsets.only(
+            bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
+      );
+      //type 3
+      Container mapContainer = new Container(
+        padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+        width: 200.0,
+        decoration: BoxDecoration(
+            color: greyColor2,
+            borderRadius: BorderRadius.circular(8.0)),
+        margin: EdgeInsets.only(
+            bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+            right: 10.0),
+
+        child: new GestureDetector(
+          onTap: _gotoMapPage,
+          child: Row(
+            children: <Widget>[
+
+              Container(
+                child: new Image.asset(
+                  'images/position.png',
+                  width: 60.0,
+                  height: 60.0,
+//                  fit: BoxFit.cover,
+                ),
+                margin: EdgeInsets.only(left: 6.0),
+              ),
+              Container(
+                child:  new Text('你的位置',
+                    style: new TextStyle(
+                      color: primaryColor,
+                      fontSize: 16,
+//                       fontWeight: FontWeight.w600
+                    )),
+                margin:new EdgeInsets.symmetric(horizontal: 11.0),
+              )
+            ],
+          ),
+        ),
+      );
+      Container result;
+      switch (type) {
+        case 0:
+          result = textContainer;
+          break;
+        case 1:
+          result = imageContainer;
+          break;
+        case 2:
+          result = stickerContainer;
+          break;
+        case 3:
+          result = mapContainer;
+          break;
+        default:
+          result = new Container();
+      }
+      return result;
+    }
+
+    // 显示对方消息
+    Container showLeftMassage(int type, String msg) {
+      Container textContainer = new Container(
+        child: Text(
+          document['content'],
+          style: TextStyle(color: Colors.white),
+        ),
+        padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+        width: 200.0,
+        decoration: BoxDecoration(
+            color: primaryColor, borderRadius: BorderRadius.circular(8.0)),
+        margin: EdgeInsets.only(left: 10.0),
+      );
+      Container imageContainer = new Container(
+        child: FlatButton(
+          child: Material(
+            child: CachedNetworkImage(
+              placeholder: (context, url) => Container(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                ),
+                width: 200.0,
+                height: 200.0,
+                padding: EdgeInsets.all(70.0),
+                decoration: BoxDecoration(
+                  color: greyColor2,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(8.0),
+                  ),
+                ),
+              ),
+              errorWidget: (context, url, error) => Material(
+                child: Image.asset(
+                  'images/img_not_available.jpeg',
+                  width: 200.0,
+                  height: 200.0,
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(8.0),
+                ),
+                clipBehavior: Clip.hardEdge,
+              ),
+              imageUrl: document['content'],
+              width: 200.0,
+              height: 200.0,
+              fit: BoxFit.cover,
+            ),
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            clipBehavior: Clip.hardEdge,
+          ),
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => FullPhoto(url: document['content'])));
+          },
+          padding: EdgeInsets.all(0),
+        ),
+        margin: EdgeInsets.only(left: 10.0),
+      );
+      Container stickerContainer = new Container(
+        child: new Image.asset(
+          'images/${document['content']}.gif',
+          width: 100.0,
+          height: 100.0,
+          fit: BoxFit.cover,
+        ),
+        margin: EdgeInsets.only(
+            bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
+      );
+      Container mapContainer = new Container(
+        padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+        width: 200.0,
+        decoration: BoxDecoration(
+            color: primaryColor,
+            borderRadius: BorderRadius.circular(8.0)),
+        margin: EdgeInsets.only(left: 10.0),
+
+        child: new GestureDetector(
+          onTap: _gotoMapPage,
+          child: Row(
+            children: <Widget>[
+
+              Container(
+                child: new Image.asset(
+                  'images/position.png',
+                  width: 60.0,
+                  height: 60.0,
+//                  fit: BoxFit.cover,
+                ),
+                margin: EdgeInsets.only(left: 6.0),
+              ),
+             Container(
+               child:  new Text('对方的位置',
+                   style: new TextStyle(
+                       color: Colors.white,
+                       fontSize: 16,
+//                       fontWeight: FontWeight.w600
+                   )),
+               margin:new EdgeInsets.symmetric(horizontal: 11.0),
+             )
+            ],
+          ),
+        ),
+      );
+      Container result;
+      switch (type) {
+        case 0:
+          result = textContainer;
+          break;
+        case 1:
+          result = imageContainer;
+          break;
+        case 2:
+          result = stickerContainer;
+          break;
+        case 3:
+          result = mapContainer;
+          break;
+        default:
+          result = new Container();
+      }
+      return result;
+    }
+
     if (document['idFrom'] == id) {
       // Right (my message)
       return Row(
         children: <Widget>[
-          document['type'] == 0
-              // Text
-              ? Container(
-                  child: Text(
-                    document['content'],
-                    style: TextStyle(color: primaryColor),
-                  ),
-                  padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                  width: 200.0,
-                  decoration: BoxDecoration(
-                      color: greyColor2,
-                      borderRadius: BorderRadius.circular(8.0)),
-                  margin: EdgeInsets.only(
-                      bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                      right: 10.0),
-                )
-              : document['type'] == 1
-                  // Image
-                  ? Container(
-                      child: FlatButton(
-                        child: Material(
-                          child: CachedNetworkImage(
-                            placeholder: (context, url) => Container(
-                              child: CircularProgressIndicator(
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(themeColor),
-                              ),
-                              width: 200.0,
-                              height: 200.0,
-                              padding: EdgeInsets.all(70.0),
-                              decoration: BoxDecoration(
-                                color: greyColor2,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(8.0),
-                                ),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) => Material(
-                              child: Image.asset(
-                                'images/img_not_available.jpeg',
-                                width: 200.0,
-                                height: 200.0,
-                                fit: BoxFit.cover,
-                              ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(8.0),
-                              ),
-                              clipBehavior: Clip.hardEdge,
-                            ),
-                            imageUrl: document['content'],
-                            width: 200.0,
-                            height: 200.0,
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                          clipBehavior: Clip.hardEdge,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      FullPhoto(url: document['content'])));
-                        },
-                        padding: EdgeInsets.all(0),
-                      ),
-                      margin: EdgeInsets.only(
-                          bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                          right: 10.0),
-                    )
-                  // Sticker
-                  : document['type'] == 2
-                      ? Container(
-                          child: new Image.asset(
-                            'images/${document['content']}.gif',
-                            width: 100.0,
-                            height: 100.0,
-                            fit: BoxFit.cover,
-                          ),
-                          margin: EdgeInsets.only(
-                              bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                              right: 10.0),
-                        )
-                      //todo: 完成定位
-                      : Container(
-                          child: Text("prosition"),
-                        ),
+          //todo: temp
+          showRightMassage(document['type'], document['content'])
         ],
         mainAxisAlignment: MainAxisAlignment.end,
       );
@@ -288,6 +476,7 @@ class ChatScreenState extends State<ChatScreen> {
           children: <Widget>[
             Row(
               children: <Widget>[
+                // show the peerAvatar（对方头像）
                 isLastMessageLeft(index)
                     ? Material(
                         child: CachedNetworkImage(
@@ -312,83 +501,8 @@ class ChatScreenState extends State<ChatScreen> {
                         clipBehavior: Clip.hardEdge,
                       )
                     : Container(width: 35.0),
-                document['type'] == 0
-                    ? Container(
-                        child: Text(
-                          document['content'],
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                        width: 200.0,
-                        decoration: BoxDecoration(
-                            color: primaryColor,
-                            borderRadius: BorderRadius.circular(8.0)),
-                        margin: EdgeInsets.only(left: 10.0),
-                      )
-                    : document['type'] == 1
-                        ? Container(
-                            child: FlatButton(
-                              child: Material(
-                                child: CachedNetworkImage(
-                                  placeholder: (context, url) => Container(
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          themeColor),
-                                    ),
-                                    width: 200.0,
-                                    height: 200.0,
-                                    padding: EdgeInsets.all(70.0),
-                                    decoration: BoxDecoration(
-                                      color: greyColor2,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(8.0),
-                                      ),
-                                    ),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      Material(
-                                    child: Image.asset(
-                                      'images/img_not_available.jpeg',
-                                      width: 200.0,
-                                      height: 200.0,
-                                      fit: BoxFit.cover,
-                                    ),
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(8.0),
-                                    ),
-                                    clipBehavior: Clip.hardEdge,
-                                  ),
-                                  imageUrl: document['content'],
-                                  width: 200.0,
-                                  height: 200.0,
-                                  fit: BoxFit.cover,
-                                ),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(8.0)),
-                                clipBehavior: Clip.hardEdge,
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => FullPhoto(
-                                            url: document['content'])));
-                              },
-                              padding: EdgeInsets.all(0),
-                            ),
-                            margin: EdgeInsets.only(left: 10.0),
-                          )
-                        : Container(
-                            child: new Image.asset(
-                              'images/${document['content']}.gif',
-                              width: 100.0,
-                              height: 100.0,
-                              fit: BoxFit.cover,
-                            ),
-                            margin: EdgeInsets.only(
-                                bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                                right: 10.0),
-                          ),
+
+                showLeftMassage(document['type'], document['content'])
               ],
             ),
 
@@ -415,6 +529,8 @@ class ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  // 在屏幕上，对方为最后一条消息
+  // 最后一条消息，下面为输入框或自己消息，空格加大
   bool isLastMessageLeft(int index) {
     if ((index > 0 &&
             listMessage != null &&
@@ -426,6 +542,7 @@ class ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  // 在屏幕上，我方为最后一条消息
   bool isLastMessageRight(int index) {
     if ((index > 0 &&
             listMessage != null &&
@@ -604,14 +721,14 @@ class ChatScreenState extends State<ChatScreen> {
           : Container(),
     );
   }
-   //todo: 发送经纬度
+
+  //todo: 发送经纬度
   _getPosition() {
-    Navigator.push(
-      context,
-      // 需要修改
-      new MaterialPageRoute(builder: (context) => Map()),
-    );
+    print("1");
+    String msg = "location";
+    onSendMessage(msg, 3);
   }
+
   Widget buildInput() {
     return Container(
       child: Row(
@@ -619,7 +736,7 @@ class ChatScreenState extends State<ChatScreen> {
           // Button send image
           Material(
             child: new Container(
-              margin: new EdgeInsets.symmetric(horizontal: 0.5),
+              margin: new EdgeInsets.symmetric(horizontal: 0.0),
               child: new IconButton(
                 icon: new Icon(Icons.image),
                 onPressed: getImage,
@@ -630,7 +747,7 @@ class ChatScreenState extends State<ChatScreen> {
           ),
           Material(
             child: new Container(
-              margin: new EdgeInsets.symmetric(horizontal: 0.5),
+              margin: new EdgeInsets.symmetric(horizontal: 0.0),
               child: new IconButton(
                 icon: new Icon(Icons.face),
                 onPressed: getSticker,
@@ -641,7 +758,7 @@ class ChatScreenState extends State<ChatScreen> {
           ),
           Material(
             child: new Container(
-              margin: new EdgeInsets.symmetric(horizontal: 0.5),
+              margin: new EdgeInsets.symmetric(horizontal: 0.0),
               child: new IconButton(
                 icon: new Icon(Icons.add_location),
                 color: primaryColor,
@@ -687,7 +804,6 @@ class ChatScreenState extends State<ChatScreen> {
           color: Colors.white),
     );
   }
-
 
   Widget buildListMessage() {
     return Flexible(

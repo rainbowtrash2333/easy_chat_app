@@ -34,6 +34,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - images/position.png
     - images/img_not_available.jpeg
     - images/mimi1.gif
     - images/mimi2.gif
