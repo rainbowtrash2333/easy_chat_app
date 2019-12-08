@@ -481,7 +481,6 @@ class ChatScreenState extends State<ChatScreen> {
       // Right (my message)
       return Row(
         children: <Widget>[
-          //todo: temp
           showRightMassage(document['type'], document['content'])
         ],
         mainAxisAlignment: MainAxisAlignment.end,
