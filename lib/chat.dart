@@ -16,8 +16,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Chat extends StatelessWidget {
   final String peerId;
   final String peerAvatar;
+  final String peerNickName;
 
-  Chat({Key key, @required this.peerId, @required this.peerAvatar})
+  Chat({Key key, @required this.peerId, @required this.peerAvatar,@required this.peerNickName})
       : super(key: key);
 
   @override
@@ -25,7 +26,7 @@ class Chat extends StatelessWidget {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(
-          '聊天',
+          peerNickName,
           style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,

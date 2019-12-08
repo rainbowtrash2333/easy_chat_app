@@ -59,7 +59,7 @@ class _MapState extends State<Map> {
     }
 
     setState(() {
-      _markers.clear();
+      // _markers.clear();
       _markers.add(Marker(
         // This marker id can be anything that uniquely identifies each marker.
         markerId: MarkerId(_userPostion.toString()),
