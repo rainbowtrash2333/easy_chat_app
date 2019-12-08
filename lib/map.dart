@@ -1,119 +1,80 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 
-// todo：修改为传入经纬度，显示marker
-class Map extends StatefulWidget {
-  double latitude;
-  double longitude;
 
-  Map({this.latitude, this.longitude});
+class UserPosition {
+  final double latitude;
+  final double longitude;
+
+  UserPosition({@required this.latitude, @required this.longitude});
+
+  UserPosition.fromJson(Map<String, dynamic> json)
+      : latitude = json['latitude'],
+        longitude = json['longitude'];
+
+  Map<String, dynamic> toJson() =>
+      {
+        'latitude': latitude,
+        'longitude': longitude,
+      };
 
   @override
-  _MapState createState() => _MapState();
+  String toString() {
+    return "latitude: ${this.latitude}\t longitude: ${this.longitude}";
+  }
 }
 
-class _MapState extends State<Map> {
+class MapPage extends StatefulWidget {
+  final UserPosition position;
+
+  MapPage({@required this.position});
+
+  @override
+  _MapPageState createState() => _MapPageState();
+}
+
+class _MapPageState extends State<MapPage> {
   GoogleMapController _controller;
-
-  static const LatLng _center = const LatLng(39.913818, 116.363625);
-
-  final Set<Marker> _markers = {};
-
-  LatLng _lastMapPosition = _center;
-
-  MapType _currentMapType = MapType.normal;
-
-  Position _currentPosition;
-
-  _getCurrentLocation() {
-    final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
-
-    geolocator
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
-        .then((Position position) {
-      setState(() {
-        _currentPosition = position;
-//        print("position:${position.toString()} ");
-      });
-    }).catchError((e) {
-      print(e);
-    });
-  }
-
-  LatLng _userPostion = LatLng(24.8275832, 102.8522499);
-
-  void _onAddMarkerButtonPressed() {
-    _getCurrentLocation();
-    _controller.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(target: _userPostion, zoom: 15.0),
-      ),
-    );
-
-    if (_currentPosition != null) {
-      _userPostion =
-          LatLng(_currentPosition.latitude, _currentPosition.longitude);
-      print(
-          "LAT: ${_currentPosition.latitude}, LNG: ${_currentPosition.longitude}");
-    }
-
-    setState(() {
-      // _markers.clear();
-      _markers.add(Marker(
-        // This marker id can be anything that uniquely identifies each marker.
-        markerId: MarkerId(_userPostion.toString()),
-        position: _userPostion,
-        infoWindow: InfoWindow(
-          title: 'your Position',
-          snippet: 'your location',
-        ),
-        icon: BitmapDescriptor.defaultMarker,
-      ));
-    });
-  }
-
-  void _onCameraMove(CameraPosition position) {
-    _lastMapPosition = position.target;
-  }
-
   void _onMapCreated(GoogleMapController controller) {
     _controller = controller;
   }
-
+//  LatLng _center = const LatLng(widget.position.latitude, widget.position.latitude);
   @override
   Widget build(BuildContext context) {
+    final LatLng _position =  LatLng(widget.position.latitude, widget.position.longitude);
+    print(_position.toString());
+    LatLng _lastMapPosition = _position;
+    final Set<Marker> _markers ={};
+    Marker _maker = Marker(
+      // This marker id can be anything that uniquely identifies each marker.
+      markerId: MarkerId(_position.toString()),
+      position: _position,
+      infoWindow: InfoWindow(
+        title: 'your Position',
+        snippet: 'your location',
+      ),
+      icon: BitmapDescriptor.defaultMarker,
+    );
+    _markers.add(_maker);
+
+    void _onCameraMove(CameraPosition position) {
+      _lastMapPosition = position.target;
+    }
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text('My Little Map'),
+          title: Text('位置信息'),
           backgroundColor: Colors.blue[700],
         ),
-        body: Stack(
-          children: <Widget>[
-            GoogleMap(
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: _center,
-                zoom: 11.0,
-              ),
-              mapType: _currentMapType,
-              markers: _markers,
-              onCameraMove: _onCameraMove,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: FloatingActionButton(
-                  onPressed: _onAddMarkerButtonPressed,
-                  materialTapTargetSize: MaterialTapTargetSize.padded,
-                  backgroundColor: Colors.blue,
-                  child: const Icon(Icons.add_location, size: 36.0),
-                ),
-              ),
-            ),
-          ],
+        body: GoogleMap(
+          onMapCreated: _onMapCreated,
+          initialCameraPosition: CameraPosition(
+            target: _position,
+            zoom: 15.0,
+          ),
+          mapType: MapType.normal,
+          markers: _markers,
+          onCameraMove: _onCameraMove,
         ),
       ),
     );

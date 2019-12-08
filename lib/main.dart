@@ -37,7 +37,7 @@ class MainScreenState extends State<MainScreen> {
   // 详情 https://firebase.google.com/docs/cloud-messaging/
   final FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  new FlutterLocalNotificationsPlugin();
+      new FlutterLocalNotificationsPlugin();
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   bool isLoading = false;
@@ -48,6 +48,7 @@ class MainScreenState extends State<MainScreen> {
     registerNotification();
     configLocalNotification();
   }
+
   // 消息推送，仅在前台是可用
   void registerNotification() {
     firebaseMessaging.requestNotificationPermissions();
@@ -99,13 +100,12 @@ class MainScreenState extends State<MainScreen> {
 
   void configLocalNotification() {
     var initializationSettingsAndroid =
-    new AndroidInitializationSettings('app_icon');
+        new AndroidInitializationSettings('app_icon');
     var initializationSettingsIOS = new IOSInitializationSettings();
     var initializationSettings = new InitializationSettings(
         initializationSettingsAndroid, initializationSettingsIOS);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
-
 
   // 右上角的三个点
   // 点击选择操作
@@ -124,8 +124,6 @@ class MainScreenState extends State<MainScreen> {
     }
   }
 
-
-
   Future<bool> onBackPress() {
     openDialog();
     return Future.value(false);
@@ -137,7 +135,7 @@ class MainScreenState extends State<MainScreen> {
         builder: (BuildContext context) {
           return SimpleDialog(
             contentPadding:
-            EdgeInsets.only(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0),
+                EdgeInsets.only(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0),
             children: <Widget>[
               Container(
                 color: themeColor,
@@ -221,7 +219,6 @@ class MainScreenState extends State<MainScreen> {
     }
   }
 
-
   Future<Null> handleSignOut() async {
     this.setState(() {
       isLoading = true;
@@ -237,7 +234,7 @@ class MainScreenState extends State<MainScreen> {
 
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => MyApp()),
-            (Route<dynamic> route) => false);
+        (Route<dynamic> route) => false);
   }
 
   @override
@@ -307,13 +304,13 @@ class MainScreenState extends State<MainScreen> {
             Positioned(
               child: isLoading
                   ? Container(
-                child: Center(
-                  child: CircularProgressIndicator(
-                      valueColor:
-                      AlwaysStoppedAnimation<Color>(themeColor)),
-                ),
-                color: Colors.white.withOpacity(0.8),
-              )
+                      child: Center(
+                        child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(themeColor)),
+                      ),
+                      color: Colors.white.withOpacity(0.8),
+                    )
                   : Container(),
             )
           ],
@@ -334,26 +331,26 @@ class MainScreenState extends State<MainScreen> {
               Material(
                 child: document['photoUrl'] != null
                     ? CachedNetworkImage(
-                  placeholder: (context, url) => Container(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 1.0,
-                      valueColor:
-                      AlwaysStoppedAnimation<Color>(themeColor),
-                    ),
-                    width: 50.0,
-                    height: 50.0,
-                    padding: EdgeInsets.all(15.0),
-                  ),
-                  imageUrl: document['photoUrl'],
-                  width: 50.0,
-                  height: 50.0,
-                  fit: BoxFit.cover,
-                )
+                        placeholder: (context, url) => Container(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1.0,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(themeColor),
+                          ),
+                          width: 50.0,
+                          height: 50.0,
+                          padding: EdgeInsets.all(15.0),
+                        ),
+                        imageUrl: document['photoUrl'],
+                        width: 50.0,
+                        height: 50.0,
+                        fit: BoxFit.cover,
+                      )
                     : Icon(
-                  Icons.account_circle,
-                  size: 50.0,
-                  color: greyColor,
-                ),
+                        Icons.account_circle,
+                        size: 50.0,
+                        color: greyColor,
+                      ),
                 borderRadius: BorderRadius.all(Radius.circular(25.0)),
                 clipBehavior: Clip.hardEdge,
               ),
@@ -389,15 +386,15 @@ class MainScreenState extends State<MainScreen> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => Chat(
-                      peerId: document.documentID,
-                      peerAvatar: document['photoUrl'],
-                      peerNickName: document['nickname'],
-                    )));
+                          peerId: document.documentID,
+                          peerAvatar: document['photoUrl'],
+                          peerNickName: document['nickname'],
+                        )));
           },
           color: greyColor2,
           padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         ),
         margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
       );

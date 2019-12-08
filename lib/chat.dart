@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,6 +13,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Chat extends StatelessWidget {
   final String peerId;
@@ -190,14 +192,7 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   Widget buildItem(int index, DocumentSnapshot document) {
-    // 跳转map页
-    void _gotoMapPage() {
-      Navigator.push(
-        context,
-        // 需要修改
-        new MaterialPageRoute(builder: (context) => Map()),
-      );
-    }
+
 
     // 显示自己的消息
     Container showRightMassage(int type, String msg) {
@@ -276,6 +271,16 @@ class ChatScreenState extends State<ChatScreen> {
         margin: EdgeInsets.only(
             bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
       );
+      // 跳转map页
+      void _gotoMapPage() {
+        print(msg);
+        UserPosition position =UserPosition.fromJson(jsonDecode(msg));
+        print(position.toString());
+        Navigator.push(
+          context,
+          new MaterialPageRoute(builder: (context) => MapPage(position: UserPosition.fromJson(jsonDecode(msg)),)
+          ));
+      }
       //type 3
       Container mapContainer = new Container(
         padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
@@ -314,6 +319,7 @@ class ChatScreenState extends State<ChatScreen> {
           ),
         ),
       );
+
       Container result;
       switch (type) {
         case 0:
@@ -395,6 +401,7 @@ class ChatScreenState extends State<ChatScreen> {
         ),
         margin: EdgeInsets.only(left: 10.0),
       );
+
       Container stickerContainer = new Container(
         child: new Image.asset(
           'images/${document['content']}.gif',
@@ -405,6 +412,16 @@ class ChatScreenState extends State<ChatScreen> {
         margin: EdgeInsets.only(
             bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
       );
+      void _gotoMapPage() {
+        print(msg);
+        UserPosition position = UserPosition.fromJson(jsonDecode(msg));
+        print(position.toString());
+        Navigator.push(
+          context,
+          // 需要修改
+          new MaterialPageRoute(builder: (context) => MapPage(position: UserPosition.fromJson(jsonDecode(msg)))),
+        );
+      }
       Container mapContainer = new Container(
         padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
         width: 200.0,
@@ -722,11 +739,12 @@ class ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  //todo: 发送经纬度
+  // 异步发送位置数据
   _getPosition() {
-    print("1");
-    String msg = "location";
-    onSendMessage(msg, 3);
+    Future<Position> p = Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+   p.then((v){
+     onSendMessage( jsonEncode(new UserPosition(latitude: v.latitude,longitude: v.longitude)), 3);
+   });
   }
 
   Widget buildInput() {
