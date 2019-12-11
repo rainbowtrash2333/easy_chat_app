@@ -27,49 +27,27 @@ void main() {
     expect(find.text('1'), findsOneWidget);
   });
 }
-library appengine.api.errors;
 
-import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
 
-class AppEngineError implements Exception {
-  final String message;
+import 'package:flutter_go/main.dart';
 
-  const AppEngineError(this.message);
+void main() {
+  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(new MyApp());
 
-  @override
-  String toString() => 'AppEngineException: $message';
-}
+    // Verify that our counter starts at 0.
+    expect(find.text('0'), findsOneWidget);
+    expect(find.text('1'), findsNothing);
 
-class NetworkError extends AppEngineError implements IOException {
-  NetworkError(String message) : super(message);
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pump();
 
-  @override
-  String toString() => 'NetworkError: $message';
-}
-
-class ProtocolError extends AppEngineError implements IOException {
-  static const ProtocolError INVALID_RESPONSE =
-      ProtocolError('Invalid response');
-
-  const ProtocolError(String message) : super(message);
-
-  @override
-  String toString() => 'ProtocolError: $message';
-}
-
-class ServiceError extends AppEngineError {
-  final String serviceName;
-
-  ServiceError(String message, {this.serviceName = 'ServiceError'})
-      : super(message);
-
-  @override
-  String toString() => '$serviceName: $message';
-}
-
-class ApplicationError extends AppEngineError {
-  ApplicationError(String message) : super(message);
-
-  @override
-  String toString() => 'ApplicationError: $message';
+    // Verify that our counter has incremented.
+    expect(find.text('0'), findsNothing);
+    expect(find.text('1'), findsOneWidget);
+  });
 }
