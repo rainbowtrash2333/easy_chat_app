@@ -79,7 +79,7 @@ class MainScreenState extends State<MainScreen> {
   // 显示消息推送
   void showNotification(message) async {
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-      //todo: 消息推送参数设置
+
       Platform.isAndroid
           ? 'com.twikura.easy_chat_app'
           : 'com.twikura.easy_chat_app_for_IOS',
